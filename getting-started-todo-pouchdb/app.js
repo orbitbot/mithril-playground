@@ -33,26 +33,27 @@ todo.Pouch = function() {
 
 todo.TodoList = function() {
   var db = new todo.Pouch();
-  var todos = [];
-  db.load()
-    .then(function(retrieved) {
-      console.log('retrieved', retrieved);
-      todos = retrieved;
-      m.redraw();
-    });
+  var todos = m.prop(db.load());
+  todos.then(todos);
 
   this.push = function(todo) {
-    todos.push(todo);
-    db.store(todos);
+    todos().push(todo);
+    db.store(todos());
   };
 
   this.update = function(todo) {
-    todos[todos.indexOf(todo)] = todo;
+    var dos = todos();
+    dos[dos.indexOf(todo)] = todo;
+    todos(dos);
     db.store(todos);
   };
 
   this.map = function(func) {
-    return todos.map(func);
+    var dos = todos();
+    if (dos)
+      return dos.map(func);
+    else
+      todos.then(m.redraw);
   };
 };
 
