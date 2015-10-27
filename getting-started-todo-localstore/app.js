@@ -2,7 +2,7 @@ var todo = {};
 
 todo.Todo = function(data) {
   this.description = m.prop(data.description);
-  this.done = data.done ? m.prop(false) : m.prop(data.done);
+  this.done = data.done ? m.prop(data.done) : m.prop(false);
 };
 
 todo.TodoList = function() {
@@ -13,6 +13,11 @@ todo.TodoList = function() {
 
   this.push = function(todo) {
     todos.push(todo);
+    localStorage.todos = JSON.stringify(todos);
+  };
+
+  this.update = function(todo) {
+    todos[todos.indexOf(todo)] = todo;
     localStorage.todos = JSON.stringify(todos);
   };
 
@@ -33,6 +38,11 @@ todo.vm = {
               todo.vm.description('');
             }
           };
+
+          todo.vm.toggle = function() {
+            this.done(!this.done());
+            todo.vm.list.update(this);
+          };
         }
 };
 
@@ -49,7 +59,7 @@ todo.view = function() {
               {
                 todo.vm.list.map(function(task, index) {
                   return <tr>
-                          <td><input type="checkbox" checked={ task.done() } onclick={ m.withAttr('checked', task.done) } /></td>
+                          <td><input type="checkbox" checked={ task.done() } onclick={ todo.vm.toggle.bind(task) } /></td>
                           <td style={ task.done() ? 'text-decoration: line-through' : '' }>{ task.description() }</td>
                          </tr>
                 })
